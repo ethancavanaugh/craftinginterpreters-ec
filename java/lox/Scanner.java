@@ -84,6 +84,9 @@ public class Scanner {
                 if (isDigit(c)) {
                     scanNumber();
                 }
+                else if (isAlpha(c)) {
+                    scanIdentifier();
+                }
                 else {
                     Lox.error(line, "Unexpected character.");
                 }
@@ -107,7 +110,6 @@ public class Scanner {
         String value = source.substring(start + 1, current - 1);
         addToken(STRING, value);
     }
-
     private void scanNumber() {
         while (isDigit(peek())) advance();
         //Include decimal part if exists
@@ -118,30 +120,22 @@ public class Scanner {
 
         addToken(NUMBER, Double.parseDouble(source.substring(start, current)));
     }
+    private void scanIdentifier() {
+        while (isAlphaNumeric(peek())) advance();
+        addToken(IDENTIFIER);
+    }
 
     private char advance() {
         return source.charAt(current++);
     }
-
     private char peek() {
         if (atEnd()) return '\0';
         return source.charAt(current);
     }
-
     private char peekNext() {
         if (current + 1 >= source.length()) return '\0';
         return source.charAt(current + 1);
     }
-
-    private void addToken(TokenType type) {
-        addToken(type, null);
-    }
-
-    private void addToken(TokenType type, Object literal) {
-        String text = source.substring(start, current);
-        tokens.add(new Token(type, text, literal, line));
-    }
-
     private boolean nextMatches(char expected) {
         if (atEnd() || source.charAt(current) != expected) return false;
 
@@ -149,8 +143,24 @@ public class Scanner {
         return true;
     }
 
+    private void addToken(TokenType type) {
+        addToken(type, null);
+    }
+    private void addToken(TokenType type, Object literal) {
+        String text = source.substring(start, current);
+        tokens.add(new Token(type, text, literal, line));
+    }
+
     private boolean isDigit(char c) {
         return c >= '0' && c <= '9';
+    }
+    private boolean isAlpha(char c) {
+        return  (c >= 'a' && c <= 'z') ||
+                (c >= 'A' && c <= 'Z') ||
+                (c == '_');
+    }
+    private boolean isAlphaNumeric(char c) {
+        return isDigit(c) || isAlpha(c);
     }
 
     private boolean atEnd() {

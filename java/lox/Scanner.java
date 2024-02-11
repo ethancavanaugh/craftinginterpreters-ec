@@ -76,10 +76,30 @@ public class Scanner {
                 line++;
                 break;
 
+            //String literals
+            case '"': scanString(); break;
+
             default:
                 Lox.error(line, "Unexpected character.");
                 break;
         }
+    }
+
+    private void scanString() {
+        while (peek() != '"' && !atEnd()) {
+            if (peek() == '\n') line++;
+            advance();
+        }
+
+        if (atEnd()) {
+            Lox.error(line, "Unterminated string.");
+            return;
+        }
+
+        advance();
+        //Trim quotation marks
+        String value = source.substring(start + 1, current - 1);
+        addToken(STRING, value);
     }
 
     private char advance() {

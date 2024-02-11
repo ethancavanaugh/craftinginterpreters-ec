@@ -32,7 +32,7 @@ public class Scanner {
         char c = advance();
 
         switch (c) {
-            //single character lexemes
+            //Single char tokens
             case '(': addToken(LEFT_PAREN); break;
             case ')': addToken(RIGHT_PAREN); break;
             case '{': addToken(LEFT_BRACE); break;
@@ -44,10 +44,37 @@ public class Scanner {
             case ';': addToken(SEMICOLON); break;
             case '*': addToken(STAR); break;
 
+            //Operators (one or two char)
+            case '!':
+                addToken(nextMatches('=') ? BANG_EQUAL : BANG);
+                break;
+            case '=':
+                addToken(nextMatches('=') ? EQUAL_EQUAL : EQUAL);
+                break;
+            case '<':
+                addToken(nextMatches('=') ? LESS_EQUAL : LESS);
+                break;
+            case '>':
+                addToken(nextMatches('=') ? GREATER_EQUAL : GREATER);
+                break;
+            case '/':
+                if (nextMatches('/')) {
+                    // A comment goes until the end of the line
+                    while (peek() != '\n' && !atEnd()) advance();
+                }
+                else {
+                    addToken(SLASH);
+                }
+                break;
+
             default:
                 Lox.error(line, "Unexpected character.");
                 break;
         }
+    }
+
+    private char advance() {
+        return source.charAt(current++);
     }
 
     private void addToken(TokenType type) {
@@ -59,9 +86,18 @@ public class Scanner {
         tokens.add(new Token(type, text, literal, line));
     }
 
-    private char advance() {
-        return source.charAt(current++);
+    private boolean nextMatches(char expected) {
+        if (atEnd() || source.charAt(current) != expected) return false;
+
+        current++;
+        return true;
     }
+
+    private char peek() {
+        if (atEnd()) return '\0';
+        return source.charAt(current);
+    }
+
     private boolean atEnd() {
         return current >= source.length();
     }

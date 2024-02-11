@@ -80,7 +80,13 @@ public class Scanner {
             case '"': scanString(); break;
 
             default:
-                Lox.error(line, "Unexpected character.");
+                //Number literals (handled by default to reduce cases)
+                if (isDigit(c)) {
+                    scanNumber();
+                }
+                else {
+                    Lox.error(line, "Unexpected character.");
+                }
                 break;
         }
     }
@@ -102,8 +108,29 @@ public class Scanner {
         addToken(STRING, value);
     }
 
+    private void scanNumber() {
+        while (isDigit(peek())) advance();
+        //Include decimal part if exists
+        if (peek() == '.' && isDigit(peekNext())) {
+            advance();
+            while (isDigit(peek())) advance();
+        }
+
+        addToken(NUMBER, Double.parseDouble(source.substring(start, current)));
+    }
+
     private char advance() {
         return source.charAt(current++);
+    }
+
+    private char peek() {
+        if (atEnd()) return '\0';
+        return source.charAt(current);
+    }
+
+    private char peekNext() {
+        if (current + 1 >= source.length()) return '\0';
+        return source.charAt(current + 1);
     }
 
     private void addToken(TokenType type) {
@@ -122,9 +149,8 @@ public class Scanner {
         return true;
     }
 
-    private char peek() {
-        if (atEnd()) return '\0';
-        return source.charAt(current);
+    private boolean isDigit(char c) {
+        return c >= '0' && c <= '9';
     }
 
     private boolean atEnd() {

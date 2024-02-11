@@ -85,7 +85,7 @@ public class Scanner {
                 }
                 //Block comment
                 else if (nextMatches('*')) {
-                    scanBlockComment();
+                    skipBlockComment();
                 }
                 else {
                     addToken(SLASH);
@@ -151,7 +151,7 @@ public class Scanner {
         TokenType type = keywords.getOrDefault(idStr, IDENTIFIER);
         addToken(type);
     }
-    private void scanBlockComment() {
+    private void skipBlockComment() {
         while (!(peek() == '*' && peekNext() == '/') && !atEnd()){
             if (peek() == '\n') line++;
             advance();

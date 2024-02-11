@@ -83,6 +83,10 @@ public class Scanner {
                     // A comment goes until the end of the line
                     while (peek() != '\n' && !atEnd()) advance();
                 }
+                //Block comment
+                else if (nextMatches('*')) {
+                    scanBlockComment();
+                }
                 else {
                     addToken(SLASH);
                 }
@@ -146,6 +150,19 @@ public class Scanner {
         String idStr = source.substring(start, current);
         TokenType type = keywords.getOrDefault(idStr, IDENTIFIER);
         addToken(type);
+    }
+    private void scanBlockComment() {
+        while (!(peek() == '*' && peekNext() == '/') && !atEnd()){
+            if (peek() == '\n') line++;
+            advance();
+        }
+        if (atEnd()) {
+            Lox.error(line, "Unterminated block comment.");
+            return;
+        }
+
+        advance();
+        advance();
     }
 
     private char advance() {

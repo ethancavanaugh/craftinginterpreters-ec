@@ -1,1 +1,1 @@
-An interpreter for the lox language, based on the book Crafting Interpreters by Robert Nystrom
+An interpreter for the craftinginterpreters.lox language, based on the book Crafting Interpreters by Robert Nystrom

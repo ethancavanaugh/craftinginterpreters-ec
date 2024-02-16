@@ -102,21 +102,25 @@ class Parser {
             error(previous(), "Binary operator missing left operand.");
             //discard right operand
             comparison();
+            return null;
         }
         else if (match(GREATER, GREATER_EQUAL, LESS, LESS_EQUAL)) {
             error(previous(), "Binary operator missing left operand.");
             //discard right operand
             term();
+            return null;
         }
         else if (match(PLUS)) {
             error(previous(), "Binary operator missing left operand.");
             //discard right operand
             factor();
+            return null;
         }
         else if (match(STAR, SLASH)) {
             error(previous(), "Binary operator missing left operand.");
             //discard right operand
             unary();
+            return null;
         }
 
         return primary();

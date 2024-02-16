@@ -90,10 +90,33 @@ class Parser {
     }
 
     private Expr unary() {
+
         if (match(BANG, MINUS)) {
             Token operator = previous();
             Expr right = unary();
             return new Expr.Unary(operator, right);
+        }
+
+        //Error productions - binary operators without left operand
+        if (match(BANG_EQUAL, EQUAL_EQUAL)) {
+            error(previous(), "Binary operator missing left operand.");
+            //discard right operand
+            comparison();
+        }
+        else if (match(GREATER, GREATER_EQUAL, LESS, LESS_EQUAL)) {
+            error(previous(), "Binary operator missing left operand.");
+            //discard right operand
+            term();
+        }
+        else if (match(PLUS)) {
+            error(previous(), "Binary operator missing left operand.");
+            //discard right operand
+            factor();
+        }
+        else if (match(STAR, SLASH)) {
+            error(previous(), "Binary operator missing left operand.");
+            //discard right operand
+            unary();
         }
 
         return primary();

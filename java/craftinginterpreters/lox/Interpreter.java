@@ -97,6 +97,9 @@ public class Interpreter implements Expr.Visitor<Object> {
     }
 
     private Object evaluate(Expr expr) {
+        //***Temporarily added to prevent crash before errors are handled in parser***
+        if (expr == null) return null;
+
         return expr.accept(this);
     }
 

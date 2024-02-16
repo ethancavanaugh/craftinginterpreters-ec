@@ -29,7 +29,7 @@ class Parser {
     }
 
     private Expr equality() {
-        Expr expr = comparison();  //a == b == c
+        Expr expr = comparison();
 
         while (match(BANG_EQUAL, EQUAL_EQUAL)) {
             Token operator = previous();

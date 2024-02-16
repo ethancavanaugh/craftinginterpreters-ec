@@ -9,6 +9,7 @@ import java.nio.file.Paths;
 import java.util.List;
 
 public class Lox {
+    private static final Interpreter interpreter = new Interpreter();
     static boolean hadError = false;
     static boolean hadRuntimeError = false;
 
@@ -52,8 +53,9 @@ public class Lox {
         Parser parser = new Parser(tokens);
         Expr parsedExpr = parser.parse();
         if (hadError) return;
+        //System.out.println(new AstPrinter().print(parsedExpr));
 
-        System.out.println(new AstPrinter().print(parsedExpr));
+        interpreter.interpret(parsedExpr);
     }
 
     static void error(int line, String message) {

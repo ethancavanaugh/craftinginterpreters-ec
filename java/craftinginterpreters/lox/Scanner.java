@@ -64,6 +64,8 @@ public class Scanner {
             case '+': addToken(PLUS); break;
             case ';': addToken(SEMICOLON); break;
             case '*': addToken(STAR); break;
+            case '?': addToken(QUESTION); break;
+            case ':': addToken(COLON); break;
 
             //Operators (one or two char)
             case '!':

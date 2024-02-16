@@ -90,7 +90,7 @@ class Parser {
     }
 
     private Expr unary() {
-
+        //Valid unary operators
         if (match(BANG, MINUS)) {
             Token operator = previous();
             Expr right = unary();

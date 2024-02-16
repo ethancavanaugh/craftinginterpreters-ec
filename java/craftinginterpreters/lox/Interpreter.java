@@ -24,6 +24,10 @@ public class Interpreter implements Expr.Visitor<Object> {
                 else if (left instanceof String && right instanceof String) {
                     return (String) left + (String) right;
                 }
+                //Number + String converts number to a string and concatenates
+                else if ((left instanceof String && right instanceof Double) || (left instanceof Double && right instanceof String)){
+                    return stringify(left)+ stringify(right);
+                }
                 else {
                     throw new RuntimeError(expr.operator, "Operands must both be numbers or strings.");
                 }

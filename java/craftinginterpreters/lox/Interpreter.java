@@ -51,7 +51,7 @@ public class Interpreter implements Expr.Visitor<Object> {
 
     @Override
     public Object visitGroupingExpr(Expr.Grouping expr) {
-        return evaluate(expr);
+        return evaluate(expr.expression);
     }
 
     @Override

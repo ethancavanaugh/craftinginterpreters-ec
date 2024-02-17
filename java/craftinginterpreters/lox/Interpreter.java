@@ -117,7 +117,10 @@ public class Interpreter implements Expr.Visitor<Object> {
 
     @Override
     public Object visitTernaryExpr(Expr.Ternary expr) {
-        return null;
+        if (isTruthy(evaluate(expr.condition))) {
+            return evaluate(expr.trueExpr);
+        }
+        return evaluate(expr.falseExpr);
     }
 
     private void checkNumberOperands(Token operator, Object... operands) {

@@ -1,5 +1,6 @@
 package craftinginterpreters.lox;
 
+import java.beans.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -48,6 +49,7 @@ class Parser {
 
     private Stmt statement() {
         if (match(PRINT)) return printStatement();
+        if (match(LEFT_BRACE)) return blockStatement();
 
         return expressionStatement();
     }
@@ -62,6 +64,17 @@ class Parser {
         Expr expr = expression();
         consume(SEMICOLON, "Expect ';' at end of statement.");
         return new Stmt.Expression(expr);
+    }
+
+    private Stmt blockStatement() {
+        List<Stmt> stmts = new ArrayList<>();
+
+        while (!atEnd() && !check(RIGHT_BRACE)) {
+            stmts.add(declaration());
+        }
+        consume(RIGHT_BRACE, "Expect '}' after block.");
+
+        return new Stmt.Block(stmts);
     }
 
     private Expr expression() {

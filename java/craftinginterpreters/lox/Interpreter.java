@@ -17,6 +17,12 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
     }
 
     @Override
+    public Void visitBlockStmt(Stmt.Block stmt) {
+        executeBlock(stmt.statements, new Environment(environment));
+        return null;
+    }
+
+    @Override
     public Void visitExpressionStmt(Stmt.Expression stmt) {
         evaluate(stmt.expression);
         return null;
@@ -176,6 +182,19 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
     private void execute(Stmt stmt) {
         stmt.accept(this);
+    }
+
+    private void executeBlock(List<Stmt> stmts, Environment environment) {
+        Environment previousEnv = this.environment;
+        try {
+            this.environment = environment;
+            for (Stmt stmt : stmts) {
+                execute(stmt);
+            }
+        }
+        finally {
+            this.environment = previousEnv;
+        }
     }
 
     //Null and false booleans are falsy, all other values are truthy

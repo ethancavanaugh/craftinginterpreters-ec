@@ -25,8 +25,8 @@ public class GenerateAst {
         ));
 
         defineAst(outputDir, "Stmt", Arrays.asList(
-                "Break      : Token token",
-                "Continue   : Token token",
+                "Break      : ",
+                "Continue   : ",
                 "Block      : List<Stmt> statements",
                 "Expression : Expr expression",
                 "If         : Expr condition, Stmt thenBranch, Stmt elseBranch",
@@ -65,14 +65,21 @@ public class GenerateAst {
         writer.println("\tstatic class " + className + " extends " + baseName + " {");
 
         //Fields
-        for (String field : fields.split(", ")) {
+        String[] fieldList;
+        if (fields.isEmpty()) {
+            fieldList = new String[0];
+        }
+        else {
+            fieldList = fields.split(", ");
+        }
+        for (String field : fieldList) {
             writer.println("\t\tfinal " + field + ";");
         }
         writer.println();
 
         //Constructor
         writer.println("\t\tpublic " + className + "(" + fields + ") {");
-        for (String field : fields.split(", ")) {
+        for (String field : fieldList) {
             String name = field.split(" ")[1];
             writer.println("\t\t\tthis." + name + " = " + name + ";");
         }

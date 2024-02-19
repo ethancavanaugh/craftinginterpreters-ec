@@ -62,16 +62,14 @@ class Parser {
 
     private Stmt breakStatement() {
         if (!inLoop) error(previous(), "Break statement must appear inside a loop");
-        Token token = previous();
         consume(SEMICOLON, "Expect semicolon after 'break'.");
-        return new Stmt.Break(token);
+        return new Stmt.Break();
     }
 
     private Stmt continueStatement() {
         if (!inLoop) error(previous(), "Continue statement must appear inside a loop");
-        Token token = previous();
         consume(SEMICOLON, "Expect semicolon after 'continue'.");
-        return new Stmt.Continue(token);
+        return new Stmt.Continue();
     }
 
     private Stmt whileStatement() {

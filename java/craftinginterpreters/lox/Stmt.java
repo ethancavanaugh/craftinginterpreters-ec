@@ -17,10 +17,8 @@ abstract class Stmt {
 	abstract <R> R accept(Visitor<R> visitor);
 
 	static class Break extends Stmt {
-		final Token token;
 
-		public Break(Token token) {
-			this.token = token;
+		public Break() {
 		}
 
 		@Override
@@ -29,10 +27,8 @@ abstract class Stmt {
 		}
 	}
 	static class Continue extends Stmt {
-		final Token token;
 
-		public Continue(Token token) {
-			this.token = token;
+		public Continue() {
 		}
 
 		@Override

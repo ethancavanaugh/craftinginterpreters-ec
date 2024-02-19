@@ -17,6 +17,16 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
     }
 
     @Override
+    public Void visitBreakStmt(Stmt.Break stmt) {
+        throw new ControlException.BreakException();
+    }
+
+    @Override
+    public Void visitContinueStmt(Stmt.Continue stmt) {
+        throw new ControlException.ContinueException();
+    }
+
+    @Override
     public Void visitBlockStmt(Stmt.Block stmt) {
         executeBlock(stmt.statements, new Environment(environment));
         return null;
@@ -57,7 +67,18 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
     @Override
     public Void visitWhileStmt(Stmt.While stmt) {
-        while(isTruthy(evaluate(stmt.condition))) execute(stmt.body);
+        while(isTruthy(evaluate(stmt.condition))) {
+            try {
+                executeInLoop(stmt.body);
+            }
+            catch (ControlException e) {
+                if (e instanceof ControlException.BreakException) break;
+                if (e instanceof ControlException.ContinueException) {
+                    //Still carries out increment expression if in for loop
+                    if (stmt.increment != null) evaluate(stmt.increment);
+                }
+            }
+        }
         return null;
     }
 
@@ -214,6 +235,10 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
     }
 
     private void execute(Stmt stmt) {
+        stmt.accept(this);
+    }
+
+    private void executeInLoop(Stmt stmt) {
         stmt.accept(this);
     }
 

@@ -10,6 +10,7 @@ class Parser {
     private static class ParseError extends RuntimeException {}
 
     private final List<Token> tokens;
+    private boolean inLoop = false;
     private int current = 0;
 
     Parser(List<Token> tokens) {
@@ -48,6 +49,8 @@ class Parser {
     }
 
     private Stmt statement() {
+        if (match(BREAK)) return breakStatement();
+        if (match(CONTINUE)) return continueStatement();
         if (match(WHILE)) return whileStatement();
         if (match(FOR)) return forStatement();
         if (match(IF)) return ifStatement();
@@ -57,16 +60,33 @@ class Parser {
         return expressionStatement();
     }
 
+    private Stmt breakStatement() {
+        if (!inLoop) error(previous(), "Break statement must appear inside a loop");
+        Token token = previous();
+        consume(SEMICOLON, "Expect semicolon after 'break'.");
+        return new Stmt.Break(token);
+    }
+
+    private Stmt continueStatement() {
+        if (!inLoop) error(previous(), "Continue statement must appear inside a loop");
+        Token token = previous();
+        consume(SEMICOLON, "Expect semicolon after 'continue'.");
+        return new Stmt.Continue(token);
+    }
+
     private Stmt whileStatement() {
+        inLoop = true;
         consume(LEFT_PAREN, "Expect '(' after 'while'.");
         Expr condition = expression();
         consume(RIGHT_PAREN, "Expect ')' after while condition.");
         Stmt body = statement();
 
-        return new Stmt.While(condition, body);
+        inLoop = false;
+        return new Stmt.While(condition, body, null);
     }
 
     private Stmt forStatement() {
+        inLoop = true;
         consume(LEFT_PAREN, "Expect '(' after 'for'.");
 
         Stmt initializer;
@@ -99,12 +119,13 @@ class Parser {
         }
 
         if (condition == null) condition = new Expr.Literal(true);
-        body = new Stmt.While(condition, body);
+        body = new Stmt.While(condition, body, increment);
 
         if (initializer != null) {
             body = new Stmt.Block(Arrays.asList(initializer, body));
         }
 
+        inLoop = false;
         return body;
     }
 

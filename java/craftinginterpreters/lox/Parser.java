@@ -10,7 +10,7 @@ class Parser {
     private static class ParseError extends RuntimeException {}
 
     private final List<Token> tokens;
-    private boolean inLoop = false;
+    private int loopDepth = 0;
     private int current = 0;
 
     Parser(List<Token> tokens) {
@@ -61,30 +61,30 @@ class Parser {
     }
 
     private Stmt breakStatement() {
-        if (!inLoop) error(previous(), "Break statement must appear inside a loop");
+        if (loopDepth == 0) error(previous(), "Break statement must appear inside a loop");
         consume(SEMICOLON, "Expect semicolon after 'break'.");
         return new Stmt.Break();
     }
 
     private Stmt continueStatement() {
-        if (!inLoop) error(previous(), "Continue statement must appear inside a loop");
+        if (loopDepth == 0) error(previous(), "Continue statement must appear inside a loop");
         consume(SEMICOLON, "Expect semicolon after 'continue'.");
         return new Stmt.Continue();
     }
 
     private Stmt whileStatement() {
-        inLoop = true;
+        loopDepth++;
         consume(LEFT_PAREN, "Expect '(' after 'while'.");
         Expr condition = expression();
         consume(RIGHT_PAREN, "Expect ')' after while condition.");
         Stmt body = statement();
 
-        inLoop = false;
+        loopDepth--;
         return new Stmt.While(condition, body, null);
     }
 
     private Stmt forStatement() {
-        inLoop = true;
+        loopDepth++;
         consume(LEFT_PAREN, "Expect '(' after 'for'.");
 
         Stmt initializer;
@@ -123,7 +123,7 @@ class Parser {
             body = new Stmt.Block(Arrays.asList(initializer, body));
         }
 
-        inLoop = false;
+        loopDepth--;
         return body;
     }
 

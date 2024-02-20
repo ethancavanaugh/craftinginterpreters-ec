@@ -28,6 +28,7 @@ class Parser {
 
     private Stmt declaration() {
         try {
+            if (match(FUN)) return function("function");
             if (match(VAR)) return varDeclaration();
 
             return statement();
@@ -36,6 +37,28 @@ class Parser {
             synchronize();
             return null;
         }
+    }
+
+    private Stmt.Function function(String kind) {
+        Token name = consume(IDENTIFIER, "Expect " + kind + " name.");
+
+        consume(LEFT_PAREN, "Expect '(' after " + kind + "name");
+        List<Token> parameters = new ArrayList<>();
+        if (!check(RIGHT_PAREN)) {
+            do {
+                if (parameters.size() >= 255) {
+                    error(peek(), "Maximum of 255 parameters.");
+                }
+
+                parameters.add(consume(IDENTIFIER, "Expect parameter name."));
+            } while (match(COMMA));
+        }
+        consume(RIGHT_PAREN, "Expect ')' after parameters.");
+
+        consume(LEFT_BRACE, "Expect '{' before " + kind + " body.");
+        List<Stmt> body = blockStatement();
+
+        return new Stmt.Function(name, parameters, body);
     }
 
     private Stmt varDeclaration() {
@@ -55,7 +78,7 @@ class Parser {
         if (match(FOR)) return forStatement();
         if (match(IF)) return ifStatement();
         if (match(PRINT)) return printStatement();
-        if (match(LEFT_BRACE)) return blockStatement();
+        if (match(LEFT_BRACE)) return new Stmt.Block(blockStatement());
 
         return expressionStatement();
     }
@@ -157,7 +180,7 @@ class Parser {
         return new Stmt.Expression(expr);
     }
 
-    private Stmt blockStatement() {
+    private List<Stmt> blockStatement() {
         List<Stmt> stmts = new ArrayList<>();
 
         while (!atEnd() && !check(RIGHT_BRACE)) {
@@ -165,7 +188,7 @@ class Parser {
         }
         consume(RIGHT_BRACE, "Expect '}' after block.");
 
-        return new Stmt.Block(stmts);
+        return stmts;
     }
 
     private Expr expression() {

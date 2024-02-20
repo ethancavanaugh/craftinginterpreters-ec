@@ -309,7 +309,24 @@ class Parser {
             return null;
         }
 
-        return primary();
+        return call();
+    }
+
+    private Expr call() {
+        Expr expr = primary();
+
+        //allow chained function calls e.g. foo(1)(3),
+        //where foo(1) returns a new function called with an argument of 3
+        while (true) {
+            if (match(LEFT_PAREN)) {
+                expr = finishCall(expr);
+            }
+            else {
+                break;
+            }
+        }
+
+        return expr;
     }
 
     private Expr primary() {
@@ -331,6 +348,22 @@ class Parser {
         }
 
         throw error(peek(), "Expect expression.");
+    }
+
+    private Expr finishCall(Expr callee) {
+        List<Expr> arguments = new ArrayList<>();
+        if (!check(RIGHT_PAREN)) {
+            do {
+                if (arguments.size() >= 255) {
+                    error(peek(), "Maximum of 255 arguments.");
+                }
+                arguments.add(expression());
+            } while (match(COMMA));
+        }
+
+        Token paren = consume(RIGHT_PAREN, "Expect ')' after arguments.");
+
+        return new Expr.Call(callee, paren, arguments);
     }
 
     private boolean match(TokenType... types) {

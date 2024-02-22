@@ -5,13 +5,13 @@ public class ControlException extends RuntimeException {
         super(null, null, false, false);
     }
 
-    static class BreakException extends ControlException {}
-    static class ContinueException extends ControlException {}
+    static class Break extends ControlException {}
+    static class Continue extends ControlException {}
 
-    static class ReturnException extends ControlException {
+    static class Return extends ControlException {
         final Object value;
 
-        ReturnException(Object value) {
+        Return(Object value) {
             this.value = value;
         }
     }

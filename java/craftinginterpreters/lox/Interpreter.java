@@ -37,12 +37,12 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
     @Override
     public Void visitBreakStmt(Stmt.Break stmt) {
-        throw new ControlException.BreakException();
+        throw new ControlException.Break();
     }
 
     @Override
     public Void visitContinueStmt(Stmt.Continue stmt) {
-        throw new ControlException.ContinueException();
+        throw new ControlException.Continue();
     }
 
     @Override
@@ -87,7 +87,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         Object value = null;
         if (stmt.value != null) value = evaluate(stmt.value);
 
-        throw new ControlException.ReturnException(value);
+        throw new ControlException.Return(value);
     }
 
     @Override
@@ -106,8 +106,8 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
                 executeInLoop(stmt.body);
             }
             catch (ControlException e) {
-                if (e instanceof ControlException.BreakException) break;
-                if (e instanceof ControlException.ContinueException) {
+                if (e instanceof ControlException.Break) break;
+                if (e instanceof ControlException.Continue) {
                     //Still carries out increment expression if in for loop
                     if (stmt.increment != null) evaluate(stmt.increment);
                 }

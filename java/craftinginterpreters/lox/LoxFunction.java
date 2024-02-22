@@ -24,7 +24,7 @@ public class LoxFunction implements LoxCallable {
         try {
             interpreter.executeBlock(declaration.body, environment);
         }
-        catch (ControlException.ReturnException ret) {
+        catch (ControlException.Return ret) {
             return ret.value;
         }
 

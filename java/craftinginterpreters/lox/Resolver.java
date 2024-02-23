@@ -10,9 +10,15 @@ import java.util.Stack;
 public class Resolver implements Stmt.Visitor<Void>, Expr.Visitor<Void> {
     private final Interpreter interpreter;
     private final Stack<Map<String, Boolean>> scopes = new Stack<>();
+    private FunctionType currentFunctionType = FunctionType.NONE;
 
     Resolver(Interpreter interpreter) {
         this.interpreter = interpreter;
+    }
+
+    private enum FunctionType {
+        NONE,
+        FUNCTION
     }
 
     void resolve(List<Stmt> statements) {
@@ -29,7 +35,10 @@ public class Resolver implements Stmt.Visitor<Void>, Expr.Visitor<Void> {
         expr.accept(this);
     }
 
-    private void resolveFunction(Stmt.Function function) {
+    private void resolveFunction(Stmt.Function function, FunctionType type) {
+        FunctionType enclosingFunctionType = currentFunctionType;
+        currentFunctionType = type;
+
         beginScope();
         for (Token param: function.params) {
             declare(param);
@@ -37,6 +46,7 @@ public class Resolver implements Stmt.Visitor<Void>, Expr.Visitor<Void> {
         }
         resolve(function.body);
         endScope();
+        currentFunctionType = enclosingFunctionType;
     }
 
     private void beginScope() {
@@ -81,7 +91,7 @@ public class Resolver implements Stmt.Visitor<Void>, Expr.Visitor<Void> {
         declare(stmt.name);
         define(stmt.name);
 
-        resolveFunction(stmt);
+        resolveFunction(stmt, FunctionType.FUNCTION);
         return null;
     }
 
@@ -144,6 +154,10 @@ public class Resolver implements Stmt.Visitor<Void>, Expr.Visitor<Void> {
 
     @Override
     public Void visitReturnStmt(Stmt.Return stmt) {
+        if (currentFunction == FunctionType.NONE) {
+            Lox.error(stmt.keyword, "Can't return from top-level code.");
+        }
+
         if(stmt.value != null) resolve(stmt.value);
         return null;
     }

@@ -154,7 +154,7 @@ public class Resolver implements Stmt.Visitor<Void>, Expr.Visitor<Void> {
 
     @Override
     public Void visitReturnStmt(Stmt.Return stmt) {
-        if (currentFunction == FunctionType.NONE) {
+        if (currentFunctionType == FunctionType.NONE) {
             Lox.error(stmt.keyword, "Can't return from top-level code.");
         }
 

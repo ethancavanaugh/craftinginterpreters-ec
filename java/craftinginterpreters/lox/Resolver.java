@@ -250,6 +250,7 @@ public class Resolver implements Stmt.Visitor<Void>, Expr.Visitor<Void> {
     public Void visitThisExpr(Expr.This expr) {
         if (currentClassType == ClassType.NONE){
             Lox.error(expr.keyword, "Can't use 'this' outside of a class.");
+            return null;
         }
         resolveLocal(expr, expr.keyword);
         return null;
